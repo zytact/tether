@@ -354,20 +354,31 @@ export function OpenAtLoginRow() {
  * password prompt, comes back here. */
 export function VersionRow() {
   const [update] = usePublishedState("updateAvailable");
-  const [busy, setBusy] = useState<"checking" | "installing" | null>(null);
-  const [latest, setLatest] = useState(false);
+  const [check, setCheck] = useState<"idle" | "checking" | "latest">("idle");
+  const [installing, setInstalling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fail = (reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not update Tether.");
 
-  const run = async (work: "checking" | "installing") => {
-    setBusy(work);
+  const checkForUpdate = async () => {
+    setCheck("checking");
     setError(null);
     try {
-      if (work === "checking") setLatest((await window.tether.invoke("checkForUpdate")) === null);
-      else await window.tether.invoke("installUpdate");
+      setCheck((await window.tether.invoke("checkForUpdate")) ? "idle" : "latest");
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Could not update Tether.");
+      setCheck("idle");
+      fail(reason);
+    }
+  };
+
+  const install = async () => {
+    setInstalling(true);
+    setError(null);
+    try {
+      await window.tether.invoke("installUpdate");
+    } catch (reason) {
+      fail(reason);
     } finally {
-      setBusy(null);
+      setInstalling(false);
     }
   };
 
@@ -375,25 +386,20 @@ export function VersionRow() {
     <>
       <Row
         title="Version"
-        description={latest && !update ? `v${version} is the latest version.` : `v${version}`}
+        description={check === "latest" && !update ? `v${version} is the latest version.` : `v${version}`}
         control={
           <BusyButton
             label="Check for updates"
             busyLabel="Checking"
-            busy={busy === "checking"}
-            onClick={() => void run("checking")}
+            busy={check === "checking"}
+            onClick={() => void checkForUpdate()}
           />
         }
       />
       {update && (
         <section className="update" aria-label="Update available">
           <p>Version {update.version} is available.</p>
-          <BusyButton
-            label="Install update"
-            busyLabel="Installing"
-            busy={busy === "installing"}
-            onClick={() => void run("installing")}
-          />
+          <BusyButton label="Install update" busyLabel="Installing" busy={installing} onClick={() => void install()} />
         </section>
       )}
       <Notice message={error} />

@@ -7,7 +7,7 @@ import { promisify } from "node:util";
 import { app } from "electron";
 import type { AvailableUpdate } from "../shared/ipc";
 import { nextRetry, parseManifest, pendingUpdate, verifySignature } from "./release";
-import type { PendingUpdate } from "./release";
+import type { PendingUpdate, PlatformKey } from "./release";
 
 export const MANIFEST_URL = "https://github.com/zytact/tether/releases/latest/download/latest.json";
 const CHECK_INTERVAL = 6 * 60 * 60 * 1000;
@@ -15,17 +15,20 @@ const DOWNLOAD_TIMEOUT = 10 * 60 * 1000;
 
 const run = promisify(execFile);
 
-const platformKeys: Record<string, string> = { "darwin-arm64": "darwin-aarch64", "win32-x64": "windows-x86_64" };
+const platformKeys: Partial<Record<string, PlatformKey>> = {
+  "darwin-arm64": "darwin-aarch64",
+  "win32-x64": "windows-x86_64",
+};
 
 /** The manifest key for the bundle this app was installed from, so an rpm install never downloads
  * the deb. */
-function platformKey(): string | null {
+function platformKey(): PlatformKey | null {
   const target = `${process.platform}-${process.arch}`;
   return target === "linux-x64" ? linuxPackageKey() : (platformKeys[target] ?? null);
 }
 
 /** electron-builder records a Linux package's format beside the app. */
-function linuxPackageKey(): string | null {
+function linuxPackageKey(): PlatformKey | null {
   const marker = join(process.resourcesPath, "package-type");
   const packageType = existsSync(marker) ? readFileSync(marker, "utf8").trim() : null;
   return packageType === "deb" || packageType === "rpm" ? `linux-x86_64-${packageType}` : null;

@@ -3,6 +3,8 @@ import { createPublicKey, verify } from "node:crypto";
 /** The Ed25519 key, as base64 DER, whose private half `scripts/sign-update.ts` signs releases with. */
 const PUBLIC_KEY = "MCowBQYDK2VwAyEA46vmOVepLdxypU8GlHKd94GwJtvToGniARSBIwwpMFc=";
 
+/** The manifest key for each bundle the release workflow publishes. */
+export type PlatformKey = "linux-x86_64-deb" | "linux-x86_64-rpm" | "darwin-aarch64" | "windows-x86_64";
 type ReleaseAsset = { url: string; signature: string };
 type Manifest = { version: string; platforms: Record<string, ReleaseAsset> };
 /** A release newer than the running build, with the download for this platform. */
@@ -32,7 +34,7 @@ export function parseManifest(value: unknown): Manifest {
 
 /** The manifest's release when it is newer than `current`, with the download for `platform`. A newer
  * release without one is an error, since the app would otherwise never hear of it. */
-export function pendingUpdate(manifest: Manifest, current: string, platform: string | null): PendingUpdate | null {
+export function pendingUpdate(manifest: Manifest, current: string, platform: PlatformKey | null): PendingUpdate | null {
   if (!isNewer(manifest.version, current)) return null;
   const asset = platform === null ? undefined : manifest.platforms[platform];
   if (!asset) throw new Error(`the release has no update for ${platform ?? process.platform}`);

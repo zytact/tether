@@ -17,7 +17,7 @@ describe("release manifest", () => {
 
   it("offers only a later version", () => {
     const offered = (version: string, current: string) =>
-      pendingUpdate({ version, platforms: { deb: asset } }, current, "deb") !== null;
+      pendingUpdate({ version, platforms: { "linux-x86_64-deb": asset } }, current, "linux-x86_64-deb") !== null;
     expect(offered("3.0.1", "3.0.0")).toBe(true);
     expect(offered("3.1.0", "3.0.99")).toBe(true);
     expect(offered("3.0.0", "3.0.0")).toBe(false);

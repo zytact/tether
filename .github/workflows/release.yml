@@ -127,7 +127,7 @@ jobs:
               --rawfile signature "$bundle.sig" '.[$key] = {url: $url, signature: ($signature | rtrimstr("\n"))}' <<<"$platforms")
           done
           jq -n --arg version "${TAG#v}" --argjson platforms "$platforms" \
-            '{version: $version, pub_date: (now | todate), platforms: $platforms}' > bundles/latest.json
+            '{version: $version, platforms: $platforms}' > bundles/latest.json
 
           mapfile -t assets < <(find bundles -type f -print)
           if gh release view "$TAG" >/dev/null 2>&1; then
