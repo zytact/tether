@@ -9,7 +9,7 @@ Open at login writes an XDG autostart entry on Linux that launches with `--hidde
 - Number validation and the error alert.
 - Persistence across a restart.
 - The `Open at login` switch and its autostart entry.
-- The version line in the footer.
+- The `Version` row. [updates](updates.md) covers its button.
 
 ## How to get to it (user POV)
 

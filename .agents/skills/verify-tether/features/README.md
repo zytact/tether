@@ -8,5 +8,6 @@ One file per user-facing feature of the preview app.
 - [sound-and-urgency](sound-and-urgency.md) - the chosen sound, the system sound, and Linux urgency
 - [settings-window](settings-window.md) - validation, persistence across restarts, and open at login
 - [tray-and-window](tray-and-window.md) - tray menu, closing to the tray, reopening, and quitting
+- [updates](updates.md) - finding, offering, and refusing to install releases
 
 Every proof runs on the built Tether Preview through the helpers in `scripts/`, with the fake battery unless the file says otherwise.
