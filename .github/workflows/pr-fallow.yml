@@ -1,0 +1,19 @@
+name: fallow
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: fallow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-frontend
+      - run: vp run fallow

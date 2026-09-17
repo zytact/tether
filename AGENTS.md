@@ -1,29 +1,34 @@
 # AGENTS.md
 
-Rustcharge monitors battery levels and sends desktop notifications with sound.
+Tether is a battery monitor Electron app written in TypeScript. It runs in the system tray, and its window is a settings page whose changes apply to the running monitor at once. There is no CLI. The main process is in `src/main/`, the preload bridges in `src/preload/`, the React page in `src/renderer/`, and the types and helpers both sides use in `src/shared/`. The IPC contract lives in `src/shared/ipc.ts`.
 
-## Project conventions
+## Toolchain
 
-- Keep the polling loop synchronous unless the task requires concurrency.
-- Preserve CLI compatibility and update `README.md` when arguments or behavior change.
-- For notification or audio changes, account for platform differences. Notification urgency is Linux-only; keep platform-specific code and imports behind matching `cfg` gates.
-- For release changes, read `.github/workflows/release.yml` for supported targets, native dependencies, and packaging.
-- Test notification decisions separately from battery hardware, desktop notifications, and audio playback. Focus on threshold boundaries, charging state, and session attempt limits when changing that logic.
+The toolchain is [Vite+](https://viteplus.dev), driven by the global `vp` CLI. It bundles Vite, Vitest, Oxlint and Oxfmt, and it delegates package management to pnpm. Install it with `curl -fsSL https://vite.plus | bash`.
+
+`vp build` bundles the page into `dist/`, and `vp pack` bundles the main process and both preloads into `dist-electron/`. Lint, format, pack and staged-file config live in the `lint`, `fmt`, `pack` and `staged` blocks of `vite.config.ts`. Do not add `.oxlintrc.json`, `.oxfmtrc.json` or a `lint-staged` config.
+
+`vp check` type checks through Oxlint's type-aware path, so there is no separate `tsc --noEmit` step.
+
+`vp <name>` runs a built-in command; `vp run <name>` runs a `package.json` script. The two are not interchangeable.
+
+A pre-commit hook at `.vite-hooks/pre-commit` runs `vp staged`. `vp config` installs the dispatcher and runs from the `prepare` script.
+
+## Conventions
+
+- Keep alert decisions in `src/main/alerts.ts` as pure functions, and test them apart from the battery, notifications, and sound. Focus tests on threshold boundaries, charging state, and attempt limits.
+- Notification urgency is Linux-only. Keep platform checks next to the code they guard.
+- Prove behavior in the real app with the `verify-tether` skill.
 
 ## Validation
 
-For Rust changes, run:
+After every change, run the following commands.
 
 ```sh
-cargo fmt
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test
+vp install --frozen-lockfile
+vp check
+vp test
+vp run fallow
+vp build
+vp pack
 ```
-
-Use `cargo check` during iteration. For release or packaging changes, also run `cargo build --release` and check the affected workflow targets where available.
-
-Linux builds require ALSA development libraries and `pkg-config`; CI installs `libasound2-dev` and `pkg-config`.
-
-For documentation-only changes, verify commands and file references against the repository and check the diff for whitespace errors. Rust checks are unnecessary.
-
-Report which checks passed and which could not run, with the reason. Automated checks do not verify actual desktop notifications or sound playback; report any manual validation separately.

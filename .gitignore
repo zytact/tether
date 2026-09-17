@@ -1,2 +1,7 @@
-/target
+node_modules/
+dist/
+dist-electron/
+release/
+.fallow/
+.vite-hooks/_/
 verification-evidence/
