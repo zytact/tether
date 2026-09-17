@@ -1,6 +1,6 @@
 ---
 name: verify-tether
-description: Build and drive the isolated Tether Preview Electron tray app against a fake battery, then capture proof of its notifications, urgency, sound, settings window, persistence, and tray menu. Use when verifying a change to alert thresholds, alert sessions, settings changes, sound playback, open at login, or the tray.
+description: Build and drive the isolated Tether Preview Electron tray app against a fake battery, then capture proof of its notifications, urgency, sound, settings window, persistence, tray menu, and updates. Use when verifying a change to alert thresholds, alert sessions, settings changes, sound playback, open at login, the tray, or the updater.
 ---
 
 # Verify Tether
@@ -73,7 +73,7 @@ node $S/drive.ts screenshot "$EVIDENCE" settings
 node $S/drive.ts close
 ```
 
-The handles are: spinbuttons `High battery level`, `Low battery level`, `Alerts per crossing`, `Check every`; switches `High battery alerts`, `Low battery alerts`, `Open at login`; buttons `Choose` and `Clear` for the sound; combobox `Urgency`. The header paragraph reads the latest check, such as `12% · Not charging`. A rejected entry shows an `alert` with the reason and puts the saved value back. `fill` commits with Enter, which is how the window saves a number.
+The handles are: spinbuttons `High battery level`, `Low battery level`, `Alerts per crossing`, `Check every`; switches `High battery alerts`, `Low battery alerts`, `Open at login`; buttons `Choose` and `Clear` for the sound; combobox `Urgency`; buttons `Check for updates` and, while a release is on offer, `Install update`. The header paragraph reads the latest check, such as `12% · Not charging`. A rejected entry shows an `alert` with the reason and puts the saved value back. `fill` commits with Enter, which is how the window saves a number.
 
 Read and click the tray menu:
 

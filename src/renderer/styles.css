@@ -253,12 +253,19 @@ select:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
-footer {
-  padding-top: 14px;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-faint);
+.update {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 9px 11px;
+  border-left: 3px solid var(--accent);
+  background: var(--track);
+  font-size: 0.78rem;
+}
+.update p {
+  margin: 0;
 }
 
 @media (max-width: 420px) {

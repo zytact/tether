@@ -1,6 +1,9 @@
 import type { BatteryCheck } from "./battery";
 import type { Settings } from "./settings";
 
+/** A signed release newer than the running build, as the window and tray show it. */
+export type AvailableUpdate = { version: string };
+
 /** Every request the window can make of the main process, keyed by channel. */
 export type Commands = {
   settings: () => Settings;
@@ -10,12 +13,17 @@ export type Commands = {
   chooseSound: () => string | null;
   openAtLogin: () => boolean;
   setOpenAtLogin: (enabled: boolean) => void;
+  /** Checks for a release now, and returns it when one is newer than the running build. */
+  checkForUpdate: () => AvailableUpdate | null;
+  /** Installs the release found last and relaunches into it, so it returns only on failure. */
+  installUpdate: () => void;
 };
 
 /** What the main process publishes to the window, keyed by channel. The window can also read the
  * latest value of each, which is null until there is one. */
 export type Events = {
   batteryCheck: BatteryCheck;
+  updateAvailable: AvailableUpdate;
 };
 
 /** The channel that serves the latest value of an event. */

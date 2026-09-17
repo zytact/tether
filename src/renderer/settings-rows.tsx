@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { version } from "../../package.json";
 import { numberRanges, urgencies } from "../shared/settings";
 import type { Settings, Urgency } from "../shared/settings";
-import { PendingLabel, useVisiblePending } from "./busy";
+import { BusyButton, PendingLabel, useVisiblePending } from "./busy";
 import type { Loadable } from "./busy";
+import { usePublishedState } from "./published-state";
 
 /** The switch every settings row uses. It ignores clicks while `busy`, and dims and says so only
  * while the pending state is visible. */
@@ -342,6 +344,64 @@ export function OpenAtLoginRow() {
           )
         }
       />
+      <Notice message={error} />
+    </>
+  );
+}
+
+/** Checks for a release on demand, and offers the one the main process found, whether by this check or in
+ * the background. Installing relaunches into the new version, so only a failure, such as a cancelled
+ * password prompt, comes back here. */
+export function VersionRow() {
+  const [update] = usePublishedState("updateAvailable");
+  const [check, setCheck] = useState<"idle" | "checking" | "latest">("idle");
+  const [installing, setInstalling] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fail = (reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not update Tether.");
+
+  const checkForUpdate = async () => {
+    setCheck("checking");
+    setError(null);
+    try {
+      setCheck((await window.tether.invoke("checkForUpdate")) ? "idle" : "latest");
+    } catch (reason) {
+      setCheck("idle");
+      fail(reason);
+    }
+  };
+
+  const install = async () => {
+    setInstalling(true);
+    setError(null);
+    try {
+      await window.tether.invoke("installUpdate");
+    } catch (reason) {
+      fail(reason);
+    } finally {
+      setInstalling(false);
+    }
+  };
+
+  return (
+    <>
+      <Row
+        title="Version"
+        description={check === "latest" && !update ? `v${version} is the latest version.` : `v${version}`}
+        control={
+          <BusyButton
+            label="Check for updates"
+            busyLabel="Checking"
+            busy={check === "checking"}
+            onClick={() => void checkForUpdate()}
+          />
+        }
+      />
+      {update && (
+        <section className="update" aria-label="Update available">
+          <p>Version {update.version} is available.</p>
+          <BusyButton label="Install update" busyLabel="Installing" busy={installing} onClick={() => void install()} />
+        </section>
+      )}
       <Notice message={error} />
     </>
   );

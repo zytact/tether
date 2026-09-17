@@ -15,7 +15,8 @@ import { launchedHidden, openAtLogin, setOpenAtLogin } from "./open-at-login";
 import { changeSettings, loadSettings, saveSettings } from "./settings";
 import { SoundPlayer } from "./sound";
 import { trayItems } from "./tray-menu";
-import type { TrayAction } from "./tray-menu";
+import type { TrayAction, TrayItem } from "./tray-menu";
+import { MANIFEST_URL, Updater } from "./update";
 
 const identity = app.getName() === identities.preview.productName ? identities.preview : identities.release;
 const preview = identity === identities.preview;
@@ -33,6 +34,13 @@ const devServer = app.isPackaged ? undefined : process.env.VITE_DEV_SERVER_URL;
 const appImage = () => nativeImage.createFromDataURL(preview ? previewAppIcon : appIcon);
 // Preview builds can read a stand-in battery, so verification can drive every threshold on demand.
 const powerSupply = (preview && process.env.TETHER_POWER_SUPPLY) || undefined;
+// A dev build has no bundle to replace, and a preview installs under its own name, so a release would land
+// beside it rather than update it. Verification can point a preview at a stand-in manifest instead.
+const manifestUrl = !app.isPackaged
+  ? undefined
+  : preview
+    ? process.env.TETHER_UPDATE_MANIFEST || undefined
+    : MANIFEST_URL;
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -58,8 +66,12 @@ function start() {
 
   const settingsPath = join(app.getPath("userData"), "settings.json");
   const sound = new SoundPlayer();
-  const renderTray = createTray();
   let lastCheck: BatteryCheck | null = null;
+  const updater = new Updater(manifestUrl, (update) => {
+    renderTray();
+    publish("updateAvailable", update);
+  });
+  const renderTray = createTray(() => trayItems(lastCheck, updater.available(), identity.productName));
   const monitor = new Monitor(loadSettings(settingsPath), {
     readBattery: () => readBattery(powerSupply),
     alert: (reading, settings) => {
@@ -68,32 +80,37 @@ function start() {
     },
     checked: (check) => {
       lastCheck = check;
-      renderTray(check);
+      renderTray();
       publish("batteryCheck", check);
     },
   });
 
-  ipcMain.handle(CURRENT, (_event, event: keyof Events) => (event === "batteryCheck" ? lastCheck : null));
-  handleCommands(monitor, settingsPath);
+  const current: { [E in keyof Events]: () => Events[E] | null } = {
+    batteryCheck: () => lastCheck,
+    updateAvailable: () => updater.available(),
+  };
+  ipcMain.handle(CURRENT, (_event, event: keyof Events) => current[event]?.() ?? null);
+  handleCommands(monitor, settingsPath, updater);
 
   // Clicking the dock icon on macOS reopens the window.
   app.on("activate", showWindow);
   if (!launchedHidden()) showWindow();
   monitor.start();
+  void updater.watch();
 }
 
-/** Returns what redraws the menu for a new battery check. */
-function createTray() {
+/** Returns what redraws the menu from the latest `items`. */
+function createTray(items: () => TrayItem[]) {
   const tray = new Tray(trayImage());
   tray.setToolTip(identity.productName);
   // macOS opens the menu on a left click; elsewhere the click opens the window and the menu keeps its
   // own button.
   if (process.platform !== "darwin") tray.on("click", showWindow);
   const actions: Record<TrayAction, () => void> = { show: showWindow, quit: () => app.quit() };
-  const render = (check: BatteryCheck | null) =>
+  const render = () =>
     tray.setContextMenu(
       Menu.buildFromTemplate(
-        trayItems(check, identity.productName).map((item) =>
+        items().map((item) =>
           item === "separator"
             ? { type: "separator" }
             : {
@@ -104,11 +121,11 @@ function createTray() {
         ),
       ),
     );
-  render(null);
+  render();
   return render;
 }
 
-function handleCommands(monitor: Monitor, settingsPath: string) {
+function handleCommands(monitor: Monitor, settingsPath: string, updater: Updater) {
   handle("settings", () => monitor.settings);
   handle("updateSettings", (change) => {
     const next = changeSettings(monitor.settings, change);
@@ -131,6 +148,16 @@ function handleCommands(monitor: Monitor, settingsPath: string) {
   });
   handle("openAtLogin", () => openAtLogin(identity));
   handle("setOpenAtLogin", (enabled) => setOpenAtLogin(identity, enabled === true));
+  handle("checkForUpdate", () =>
+    updater.check().catch((error: unknown) => {
+      throw new Error(`Could not check for updates: ${message(error)}`);
+    }),
+  );
+  handle("installUpdate", () =>
+    updater.install().catch((error: unknown) => {
+      throw new Error(`Could not install the update: ${message(error)}`);
+    }),
+  );
 }
 
 /** Closing the window destroys it, so the tray and a normal launch build it afresh. A closed window
