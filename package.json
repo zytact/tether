@@ -10,7 +10,7 @@
     "dev": "node scripts/dev.ts",
     "fallow": "fallow audit --base origin/main",
     "package": "vp build && vp pack && node scripts/package.ts",
-    "prepare": "vp config --no-agent"
+    "prepare": "vp config --no-agent && node node_modules/electron/install.js"
   },
   "devDependencies": {
     "@fontsource-variable/inter-tight": "^5.3.0",
