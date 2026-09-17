@@ -2,10 +2,9 @@ import "@fontsource-variable/inter-tight/wght.css";
 import "@fontsource/newsreader/latin-400.css";
 import "@fontsource/newsreader/latin-500.css";
 import { createRoot } from "react-dom/client";
-import { version } from "../../package.json";
 import { batteryLabel } from "../shared/battery";
 import { usePublishedState } from "./published-state";
-import { AlertSettings, OpenAtLoginRow } from "./settings-rows";
+import { AlertSettings, OpenAtLoginRow, VersionRow } from "./settings-rows";
 import "./styles.css";
 
 function App() {
@@ -24,9 +23,8 @@ function App() {
       <div className="settings-list">
         <AlertSettings />
         <OpenAtLoginRow />
+        <VersionRow />
       </div>
-
-      <footer>Version {version}</footer>
     </main>
   );
 }

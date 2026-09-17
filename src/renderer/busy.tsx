@@ -26,6 +26,30 @@ export function useVisiblePending(pending: boolean): boolean {
   return visible;
 }
 
+/** A button for work that can answer at once. It ignores clicks while `busy`, and dims and shows
+ * `busyLabel` only while the pending state is visible. */
+export function BusyButton({
+  label,
+  busyLabel,
+  busy,
+  onClick,
+}: {
+  label: string;
+  busyLabel: string;
+  busy: boolean;
+  onClick: () => void;
+}) {
+  const visible = useVisiblePending(busy);
+  const click = () => {
+    if (!busy) onClick();
+  };
+  return (
+    <button onClick={click} disabled={visible} aria-busy={visible}>
+      {visible ? busyLabel : label}
+    </button>
+  );
+}
+
 /** Stands in for a value that is not read yet. `pendingLabel` keeps its space but stays hidden until
  * the read is slow, so neither a quick read nor a slow one moves the layout. */
 export function PendingLabel({

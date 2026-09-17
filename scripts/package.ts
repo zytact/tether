@@ -19,6 +19,9 @@ await build({
     directories: { output: `release/${identity.executableName}`, buildResources: "build" },
     electronDist: "node_modules/electron/dist",
     files: ["dist/**", "dist-electron/**", "package.json"],
+    // Never published by the builder. It is set so the Linux packages record their format in
+    // `resources/package-type`, which the updater reads to pick its download.
+    publish: { provider: "github", owner: "zytact", repo: "tether" },
     linux: {
       target: unpacked ? "dir" : ["deb", "rpm"],
       executableName: identity.executableName,
@@ -30,12 +33,18 @@ await build({
     deb: { artifactName: "${name}_${version}_amd64.${ext}" },
     rpm: { artifactName: "${name}-${version}.x86_64.${ext}" },
     mac: {
-      target: unpacked ? "dir" : [{ target: "dmg", arch: "arm64" }],
+      target: unpacked
+        ? "dir"
+        : [
+            { target: "dmg", arch: "arm64" },
+            { target: "tar.gz", arch: "arm64" },
+          ],
       icon: `${identity.icons}/icon.png`,
       category: "public.app-category.utilities",
-      // Ad-hoc, without an Apple Developer ID.
+      // Ad-hoc, without an Apple Developer ID. The updater checks its own signature instead.
       identity: "-",
       hardenedRuntime: false,
+      artifactName: "${productName}_${version}_aarch64.app.${ext}",
     },
     dmg: { artifactName: "${productName}_${version}_aarch64.${ext}" },
     win: {
