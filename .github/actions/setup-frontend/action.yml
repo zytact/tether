@@ -1,0 +1,15 @@
+name: setup frontend
+description: Install Vite+ and the project's frontend dependencies.
+runs:
+  using: composite
+  steps:
+    - uses: voidzero-dev/setup-vp@v1.19.0
+      env:
+        # The `prepare` script runs `vp config`; CI has no use for the git hook dispatcher.
+        VP_GIT_HOOKS: "0"
+      with:
+        version-file: pnpm-workspace.yaml
+        node-version: "24"
+        cache: true
+        run-install: |
+          args: ['--frozen-lockfile']
