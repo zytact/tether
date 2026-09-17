@@ -1,0 +1,27 @@
+name: desktop fallow
+
+on:
+  pull_request:
+    paths:
+      - desktop/**
+      - .github/actions/setup-desktop/**
+      - .github/workflows/desktop-fallow.yml
+  workflow_dispatch:
+
+concurrency:
+  group: desktop-fallow-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: desktop
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-desktop
+      - run: vp run fallow

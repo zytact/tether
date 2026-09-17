@@ -2,6 +2,8 @@
 
 Rustcharge monitors battery levels and sends desktop notifications with sound.
 
+The Rust CLI lives in the repository root. `desktop/` holds the Electron tray app port, with its own toolchain and instructions in `desktop/AGENTS.md`; the Rust conventions and validation below do not apply there.
+
 ## Project conventions
 
 - Keep the polling loop synchronous unless the task requires concurrency.

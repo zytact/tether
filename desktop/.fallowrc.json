@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": [
+    "scripts/*.ts",
+    "src/main/index.ts",
+    "src/preload/index.ts",
+    "src/preload/sound.ts",
+    "src/renderer/main.tsx"
+  ],
+  "ignoreDependencies": [
+    "@fontsource-variable/inter-tight",
+    "@fontsource/newsreader",
+    "playwright-core",
+    "react",
+    "react-dom"
+  ],
+  "duplicates": {
+    "minOccurrences": 3,
+    "ignore": ["**/*.test.*", "**/*.spec.*"]
+  },
+  "rules": {
+    "unused-dependencies": "warn"
+  }
+}

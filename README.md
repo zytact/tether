@@ -2,6 +2,8 @@
 
 RustCharge is a simple, efficient battery status monitor written in Rust. It provides desktop notifications for when your battery goes above or below a certain percentage.
 
+A desktop app with a tray icon and a settings window lives in [`desktop/`](desktop/README.md).
+
 ## Features
 
 -   Real-time battery status monitoring
