@@ -11,7 +11,7 @@ on:
         type: boolean
         default: false
       tag:
-        description: Tag to publish under (e.g. v3.0.0). Required only when publish is on.
+        description: Tag to publish under (e.g. v3.1.0). Required only when publish is on.
         type: string
         default: ""
 
