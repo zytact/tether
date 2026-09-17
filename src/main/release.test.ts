@@ -8,10 +8,10 @@ describe("release manifest", () => {
   it("keeps the platforms that name both a download and a signature", () => {
     expect(
       parseManifest({
-        version: "3.1.0",
+        version: "3.1.1",
         platforms: { "windows-x86_64": { url: "https://x/setup.exe", signature: "c2ln" }, "linux-x86_64-deb": {} },
       }),
-    ).toEqual({ version: "3.1.0", platforms: { "windows-x86_64": { url: "https://x/setup.exe", signature: "c2ln" } } });
+    ).toEqual({ version: "3.1.1", platforms: { "windows-x86_64": { url: "https://x/setup.exe", signature: "c2ln" } } });
     expect(() => parseManifest({ platforms: {} })).toThrow();
   });
 
@@ -19,14 +19,14 @@ describe("release manifest", () => {
     const offered = (version: string, current: string) =>
       pendingUpdate({ version, platforms: { "linux-x86_64-deb": asset } }, current, "linux-x86_64-deb") !== null;
     expect(offered("3.0.1", "3.0.0")).toBe(true);
-    expect(offered("3.1.0", "3.0.99")).toBe(true);
+    expect(offered("3.1.1", "3.0.99")).toBe(true);
     expect(offered("3.0.0", "3.0.0")).toBe(false);
     expect(offered("2.9.9", "3.0.0")).toBe(false);
   });
 
   it("offers the download for the installed bundle, and fails a newer release without one", () => {
-    const manifest = { version: "3.1.0", platforms: { "linux-x86_64-rpm": asset } };
-    expect(pendingUpdate(manifest, "3.0.0", "linux-x86_64-rpm")).toEqual({ version: "3.1.0", ...asset });
+    const manifest = { version: "3.1.1", platforms: { "linux-x86_64-rpm": asset } };
+    expect(pendingUpdate(manifest, "3.0.0", "linux-x86_64-rpm")).toEqual({ version: "3.1.1", ...asset });
     expect(() => pendingUpdate(manifest, "3.0.0", "linux-x86_64-deb")).toThrow("no update for linux-x86_64-deb");
     expect(() => pendingUpdate(manifest, "3.0.0", null)).toThrow();
   });
