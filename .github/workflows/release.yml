@@ -64,6 +64,13 @@ jobs:
 
       - run: vp run package
 
+      - if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          if rpm -qpl release/tether/*.rpm | grep -q '^/usr/lib/.build-id/'; then
+            echo "::error::RPM contains global build-id links"
+            exit 1
+          fi
+
       # The updater installs only bundles signed with the release key. Without it the bundles still
       # build, but publishing fails for want of signatures.
       - shell: bash

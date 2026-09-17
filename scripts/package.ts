@@ -31,7 +31,10 @@ await build({
       syncDesktopName: true,
     },
     deb: { artifactName: "${name}_${version}_amd64.${ext}" },
-    rpm: { artifactName: "${name}-${version}.x86_64.${ext}" },
+    rpm: {
+      artifactName: "${name}-${version}.x86_64.${ext}",
+      fpm: ["--rpm-rpmbuild-define", "_build_id_links none"],
+    },
     mac: {
       target: unpacked
         ? "dir"
