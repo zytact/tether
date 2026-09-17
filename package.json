@@ -1,6 +1,6 @@
 {
   "name": "tether",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Battery alerts with sound, from the system tray",
   "author": "Arnab",
