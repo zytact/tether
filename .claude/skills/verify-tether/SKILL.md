@@ -43,7 +43,7 @@ Ready means `launch.sh` prints `Ready: Tether Preview` and `doctor.sh` ends with
 - `--real-battery` skips the fake tree and reads the machine's battery. Use it once to confirm the fake tree is not lying.
 - `--restart` quits and relaunches only the preview, keeping the display, recorders, battery, and saved settings. That is how a proof shows a setting survives a restart.
 
-`build-preview.sh` runs `vp build`, `vp pack`, and `node scripts/package.ts --preview --dir`, installing Electron's binary first when a fresh install skipped it. Rebuild after every source change; doctor fails when `src` is newer than the binary.
+`build-preview.sh` runs `vp build`, `vp pack`, and `node scripts/package.ts --preview --dir`. Rebuild after every source change; doctor fails when `src` is newer than the binary.
 
 ## Doctor
 
