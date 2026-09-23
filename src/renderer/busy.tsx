@@ -32,19 +32,21 @@ export function BusyButton({
   label,
   busyLabel,
   busy,
+  disabled = false,
   onClick,
 }: {
   label: string;
   busyLabel: string;
   busy: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   const visible = useVisiblePending(busy);
   const click = () => {
-    if (!busy) onClick();
+    if (!busy && !disabled) onClick();
   };
   return (
-    <button onClick={click} disabled={visible} aria-busy={visible}>
+    <button onClick={click} disabled={visible || disabled} aria-busy={visible}>
       {visible ? busyLabel : label}
     </button>
   );

@@ -254,6 +254,7 @@ select:focus-visible {
   outline-offset: 2px;
 }
 .update {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -265,6 +266,140 @@ select:focus-visible {
   font-size: 0.78rem;
 }
 .update p {
+  margin: 0;
+}
+.update-content {
+  width: 100%;
+}
+.update-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 8px;
+}
+.update-notices {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid var(--danger);
+  background: var(--danger-surface);
+  color: var(--danger-ink);
+}
+.update-notices p {
+  margin: 6px 0;
+}
+.update-notices label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+}
+.update-notices input {
+  width: auto;
+  accent-color: var(--danger);
+}
+.update-detail {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.update-progress {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+.update-progress span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent);
+  transition: width 160ms linear;
+}
+.update-progress[data-indeterminate] span {
+  width: 30%;
+  animation: update-slide 1.1s ease-in-out infinite;
+}
+@keyframes update-slide {
+  from {
+    left: -30%;
+  }
+  to {
+    left: 100%;
+  }
+}
+.release-notes {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.release-notes[open] {
+  display: flex;
+  flex-direction: column;
+}
+.release-notes-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 26px;
+}
+.release-notes-body header {
+  align-items: center;
+}
+.release-notes-state {
+  display: block;
+  margin-top: 16px;
+}
+.release {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.release h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.release-date,
+.release-group h3,
+.credit-value {
+  color: var(--text-muted);
+}
+.release-group h3 {
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+}
+.release-group ol {
+  margin: 6px 0;
+  padding-left: 24px;
+}
+.release-group li {
+  padding: 3px 0;
+}
+.credit-value {
+  margin-left: 8px;
+}
+.release-notes-footer {
+  padding: 14px 26px;
+  border-top: 1px solid var(--hairline);
+  background: var(--canvas);
+}
+.release-notes-footer .update {
+  margin: 0;
+}
+.release-notes-install {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.release-notes-install p {
   margin: 0;
 }
 

@@ -6,6 +6,7 @@ import type { Settings, Urgency } from "../shared/settings";
 import { BusyButton, PendingLabel, useVisiblePending } from "./busy";
 import type { Loadable } from "./busy";
 import { usePublishedState } from "./published-state";
+import { UpdateNotice } from "./update-notice";
 
 /** The switch every settings row uses. It ignores clicks while `busy`, and dims and says so only
  * while the pending state is visible. */
@@ -355,7 +356,6 @@ export function OpenAtLoginRow() {
 export function VersionRow() {
   const [update] = usePublishedState("updateAvailable");
   const [check, setCheck] = useState<"idle" | "checking" | "latest">("idle");
-  const [installing, setInstalling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fail = (reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not update Tether.");
 
@@ -367,18 +367,6 @@ export function VersionRow() {
     } catch (reason) {
       setCheck("idle");
       fail(reason);
-    }
-  };
-
-  const install = async () => {
-    setInstalling(true);
-    setError(null);
-    try {
-      await window.tether.invoke("installUpdate", []);
-    } catch (reason) {
-      fail(reason);
-    } finally {
-      setInstalling(false);
     }
   };
 
@@ -396,12 +384,7 @@ export function VersionRow() {
           />
         }
       />
-      {update && (
-        <section className="update" aria-label="Update available">
-          <p>Version {update.version} is available.</p>
-          <BusyButton label="Install update" busyLabel="Installing" busy={installing} onClick={() => void install()} />
-        </section>
-      )}
+      <UpdateNotice />
       <Notice message={error} />
     </>
   );

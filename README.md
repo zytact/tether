@@ -65,6 +65,10 @@ Only a preview build reads `TETHER_POWER_SUPPLY`, which replaces the Linux sysfs
 
 ## Releases
 
-Push a `v<version>` tag matching `version` in `package.json`, and `.github/workflows/release.yml` builds the bundles on Linux, macOS, and Windows and attaches them to a draft GitHub release. Running the workflow by hand without **publish** is a dry run that keeps the bundles as workflow artifacts. The app does not update itself.
+Push a `v<version>` tag matching `version` in `package.json`, and `.github/workflows/release.yml` builds the bundles on Linux, macOS, and Windows and attaches them to a draft GitHub release. Running the workflow by hand without **publish** is a dry run that keeps the bundles as workflow artifacts.
+
+Release builds check the latest published GitHub release at launch and every 6 hours. Settings can check on demand. A newer version appears in the window and tray menu. The window shows release notes for every intervening release, download and installation progress, and any notices that need acknowledgement. Installing verifies the bundle's Ed25519 signature, installs the matching deb, rpm, macOS tarball, or Windows NSIS installer, and relaunches. Linux package installation asks for an administrator password through polkit. Dev and preview builds do not check for updates.
+
+Direct updates cover the latest 15 published releases. An older version links to the latest release for a fresh install after quitting Tether. The release workflow records the oldest eligible version in `latest.json`. Add urgent notices to `release-notices.json` with a unique `id`, a plain `message`, and inclusive `fromVersion` and `throughVersion` values. Use `platforms` with `linux`, `darwin`, or `win32` for system-specific notices. Matching notices require acknowledgement before installation. The workflow retains them while affected versions remain eligible for direct updates.
 
 macOS builds are ad-hoc signed rather than signed with an Apple Developer ID, so the first launch of a downloaded dmg needs **Open** from the app's context menu, or `xattr -dr com.apple.quarantine /Applications/Tether.app`.
