@@ -65,7 +65,7 @@ Only a preview build reads `TETHER_POWER_SUPPLY`, which replaces the Linux sysfs
 
 ## Releases
 
-Merge PRs with conventional commit titles into `main`, and [release-please](https://github.com/googleapis/release-please) maintains a release PR that bumps the root `package.json` version and writes `CHANGELOG.md`. Merging the release PR creates the `v<version>` tag and GitHub release. `.github/workflows/release.yml` then builds the signed installers and updater assets on Linux, macOS, and Windows and uploads them to that release. Leave version bumps and the changelog to release-please.
+Merge PRs with conventional commit titles into `main`, and [release-please](https://github.com/googleapis/release-please) maintains a release PR that bumps the root `package.json` version and writes `CHANGELOG.md`. Merging the release PR creates the `v<version>` tag and a draft GitHub release. `.github/workflows/release.yml` then builds the installers and signed updater assets on Linux, macOS, and Windows, uploads them, and publishes the release. A failed build or upload leaves the release as a draft so update checks keep using the previous release. Leave version bumps and the changelog to release-please.
 
 GitHub Actions must be allowed to create pull requests under Settings > Actions > General, and `UPDATE_SIGNING_KEY` must contain the updater's private signing key.
 

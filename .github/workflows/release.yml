@@ -145,6 +145,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.release-please.outputs.tag || inputs.tag || github.ref_name }}
+          RELEASE_CREATED: ${{ needs.release-please.outputs.created }}
         # latest.json is what installed apps read from the latest release. Each platform key names
         # the bundle that app was installed from, so an rpm install never downloads the deb.
         run: |
@@ -173,4 +174,7 @@ jobs:
             gh release upload "$TAG" "${assets[@]}" --clobber
           else
             gh release create "$TAG" "${assets[@]}" --draft --title "Tether $TAG" --verify-tag --generate-notes
+          fi
+          if [ "$RELEASE_CREATED" = "true" ]; then
+            gh release edit "$TAG" --draft=false
           fi
