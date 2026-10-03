@@ -20,6 +20,12 @@ A pre-commit hook at `.vite-hooks/pre-commit` runs `vp staged`. `vp config` inst
 - Notification urgency is Linux-only. Keep platform checks next to the code they guard.
 - Prove behavior in the real app with the `verify-tether` skill.
 
+## Releases
+
+The root `package.json` `version` is the only release version. The app and installers read it. release-please manages version bumps and `CHANGELOG.md`; leave both to the release PR. See `README.md#releases` for the pipeline.
+
+PRs are squash-merged, so the PR title sets the bump: `fix` patch, `feat` minor, and `!` such as `feat!:` or a `BREAKING CHANGE:` footer major. Mark changes that break installed apps, updates, or persisted settings as breaking.
+
 ## Validation
 
 After every change, run the following commands.
