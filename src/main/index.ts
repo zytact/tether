@@ -28,7 +28,7 @@ import { alertNotification } from "./notification";
 import { launchedHidden, openAtLogin, setOpenAtLogin } from "./open-at-login";
 import { changeSettings, loadSettings } from "./settings";
 import { SoundPlayer } from "./sound";
-import { healthIcon, TRAY_ICON_SIZE } from "./tray-icon";
+import { healthIcon } from "./tray-icon";
 import { trayItems } from "./tray-menu";
 import type { TrayAction } from "./tray-menu";
 import { MANIFEST_URL, Updater } from "./update";
@@ -248,13 +248,16 @@ function trayImage() {
 }
 
 /** macOS writes the health beside its template mark; elsewhere a heart and the health replace the mark,
- * colored by how worn the battery is. Without a health reading the tray shows the plain mark. */
+ * colored by how worn the battery is. Linux panels keep a wide icon's height, but Windows stretches every
+ * icon to a square. Without a health reading the tray shows the plain mark. */
 function showHealth(tray: Tray, health: WholePercent | null) {
   if (process.platform === "darwin")
     tray.setTitle(health === null ? "" : `${health}%`, { fontType: "monospacedDigit" });
   else if (health === null) tray.setImage(trayImage());
-  else
-    tray.setImage(nativeImage.createFromBitmap(healthIcon(health), { width: TRAY_ICON_SIZE, height: TRAY_ICON_SIZE }));
+  else {
+    const { bitmap, width, height } = healthIcon(health, process.platform === "win32" ? "square" : "wide");
+    tray.setImage(nativeImage.createFromBitmap(bitmap, { width, height }));
+  }
 }
 
 function publish<E extends keyof Events>(event: E, payload: Events[E]) {
