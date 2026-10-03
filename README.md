@@ -13,7 +13,7 @@ vp run dev
 
 `vp` is the [Vite+](https://viteplus.dev) CLI. Install it with `curl -fsSL https://vite.plus | bash`. It manages Node, pnpm, and the toolchain. `vp run dev` serves the page with hot reload and rebuilds the main process as it changes; main process changes take effect on the next launch.
 
-Launching Tether opens the settings window. The window and the tray show the battery health, which is the full charge as a percent of the design capacity. On Linux and Windows the tray icon becomes that number, and on macOS it sits beside the icon. Closing the window leaves the monitor running in the tray, whose menu shows the latest battery reading, reopens the window, and quits. Only one instance runs at a time, so launching it again reopens the window of the one already running. **Open at login** starts it in the tray without the window.
+Launching Tether opens the settings window. The window and the tray show the battery health, which is the full charge as a percent of the design capacity. On Linux and Windows the tray icon becomes a heart and that number, green from 80, amber from 60, and red below. On macOS the number sits beside the icon. Closing the window leaves the monitor running in the tray, whose menu shows the latest battery reading, reopens the window, and quits. Only one instance runs at a time, so launching it again reopens the window of the one already running. **Open at login** starts it in the tray without the window.
 
 ## Settings
 

@@ -2,9 +2,9 @@ import type { WholePercent } from "../shared/battery";
 
 export const TRAY_ICON_SIZE = 64;
 
-// Blocky glyphs stay legible once the panel shrinks the icon to 16 to 24 pixels, and a narrow 1 lets
-// 100 draw as large as two digits nearly do.
-const glyphs: Record<string, string[]> = {
+// Blocky glyphs stay legible once the panel shrinks the icon to 16 to 24 pixels, and a narrow 1 keeps
+// 100 compact.
+const digitGlyphs: Record<string, string[]> = {
   "0": ["###", "#.#", "#.#", "#.#", "###"],
   "1": ["#", "#", "#", "#", "#"],
   "2": ["###", "..#", "###", "#..", "###"],
@@ -16,42 +16,46 @@ const glyphs: Record<string, string[]> = {
   "8": ["###", "#.#", "###", "#.#", "###"],
   "9": ["###", "#.#", "###", "..#", "###"],
 };
+const heart = [".#.#.", "#####", "#####", ".###.", "..#.."];
 const GLYPH_HEIGHT = 5;
-const MAX_SCALE = 9;
+const SCALE = 8;
+// GNOME's AppIndicator extension keeps an icon wide only when it is at least 1.5 times as wide as it is
+// tall, and squeezes anything narrower into a square.
+const WIDE_RATIO = 1.5;
 
-/** Draws `percent` as digits on a transparent square, in the first opaque color of `mark`. Both are BGRA
- * bitmaps, as `nativeImage` reads and writes them. */
-export function percentIcon(percent: WholePercent, mark: Buffer): Buffer {
-  const digits = String(percent)
-    .split("")
-    .map((digit) => glyphs[digit]);
-  const width = digits.reduce((sum, glyph) => sum + glyph[0].length, digits.length - 1);
-  const scale = Math.min(MAX_SCALE, Math.floor(TRAY_ICON_SIZE / width));
-  const top = Math.floor((TRAY_ICON_SIZE - GLYPH_HEIGHT * scale) / 2);
-  let left = Math.floor((TRAY_ICON_SIZE - width * scale) / 2);
+const HEALTHY = Buffer.from([0x84, 0xdc, 0x3d, 255]);
+const WORN = Buffer.from([0x3d, 0xb8, 0xf5, 255]);
+const FAILING = Buffer.from([0x5c, 0x5c, 0xff, 255]);
 
-  const bitmap = Buffer.alloc(TRAY_ICON_SIZE * TRAY_ICON_SIZE * 4);
-  const color = opaquePixel(mark);
-  for (const glyph of digits) {
+/** Draws a heart and `health` as digits, green from 80, amber from 60, and red below, as a BGRA bitmap
+ * the way `nativeImage` reads it. Both shapes center the digits. A wide icon is `TRAY_ICON_SIZE` tall and
+ * as wide as the digits, padded when they are too narrow to stay wide. */
+export function healthIcon(health: WholePercent, shape: "wide" | "square") {
+  const glyphs = [
+    heart,
+    ...String(health)
+      .split("")
+      .map((digit) => digitGlyphs[digit]),
+  ];
+  const drawnWidth = glyphs.reduce((sum, glyph) => sum + glyph[0].length, glyphs.length - 1) * SCALE;
+  const width = Math.max(drawnWidth, shape === "wide" ? Math.ceil(TRAY_ICON_SIZE * WIDE_RATIO) : TRAY_ICON_SIZE);
+  const height = shape === "wide" ? TRAY_ICON_SIZE : width;
+  const top = Math.floor((height - GLYPH_HEIGHT * SCALE) / 2);
+  let left = Math.floor((width - drawnWidth) / 2);
+
+  const bitmap = Buffer.alloc(width * height * 4);
+  const color = health >= 80 ? HEALTHY : health >= 60 ? WORN : FAILING;
+  for (const glyph of glyphs) {
     glyph.forEach((row, y) =>
       row.split("").forEach((cell, x) => {
-        if (cell === "#") fill(bitmap, left + x * scale, top + y * scale, scale, color);
+        if (cell !== "#") return;
+        for (let dy = 0; dy < SCALE; dy++) {
+          const at = ((top + y * SCALE + dy) * width + left + x * SCALE) * 4;
+          for (let dx = 0; dx < SCALE; dx++) bitmap.set(color, at + dx * 4);
+        }
       }),
     );
-    left += (glyph[0].length + 1) * scale;
+    left += (glyph[0].length + 1) * SCALE;
   }
-  return bitmap;
-}
-
-function opaquePixel(bitmap: Buffer) {
-  for (let at = 0; at < bitmap.length; at += 4) {
-    if (bitmap[at + 3] === 255) return bitmap.subarray(at, at + 4);
-  }
-  throw new Error("The tray mark has no opaque pixel to take its color from.");
-}
-
-function fill(bitmap: Buffer, left: number, top: number, size: number, pixel: Buffer) {
-  for (let y = top; y < top + size; y++) {
-    for (let x = left; x < left + size; x++) bitmap.set(pixel, (y * TRAY_ICON_SIZE + x) * 4);
-  }
+  return { bitmap, width, height };
 }
