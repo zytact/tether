@@ -248,16 +248,17 @@ function trayImage() {
 }
 
 /** macOS writes the health beside its template mark; elsewhere a heart and the health replace the mark,
- * colored by how worn the battery is. Linux panels keep a wide icon's height, but Windows stretches every
- * icon to a square. Without a health reading the tray shows the plain mark. */
+ * colored by how worn the battery is. Without a health reading the tray shows the plain mark. */
 function showHealth(tray: Tray, health: WholePercent | null) {
   if (process.platform === "darwin")
     tray.setTitle(health === null ? "" : `${health}%`, { fontType: "monospacedDigit" });
-  else if (health === null) tray.setImage(trayImage());
-  else {
-    const { bitmap, width, height } = healthIcon(health, process.platform === "win32" ? "square" : "wide");
-    tray.setImage(nativeImage.createFromBitmap(bitmap, { width, height }));
-  }
+  else tray.setImage(health === null ? trayImage() : healthImage(health));
+}
+
+/** Linux panels keep a wide icon's height, but Windows stretches every icon to a square. */
+function healthImage(health: WholePercent) {
+  const { bitmap, width, height } = healthIcon(health, process.platform === "win32" ? "square" : "wide");
+  return nativeImage.createFromBitmap(bitmap, { width, height });
 }
 
 function publish<E extends keyof Events>(event: E, payload: Events[E]) {

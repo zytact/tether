@@ -42,7 +42,7 @@ describe("tray icon", () => {
     ]);
   });
 
-  it("keeps a wide icon one height and as wide as its digits", () => {
+  it("keeps a wide icon one height, as wide as its digits, and wide enough for GNOME", () => {
     const [two, three] = [drawn(icon(99)), drawn(icon(100))];
     for (const drawing of [two, three]) {
       expect(drawing.height).toBe(TRAY_ICON_SIZE);
@@ -50,7 +50,10 @@ describe("tray icon", () => {
       expect(centered(drawing.top, drawing.bottom, drawing.height)).toBe(true);
     }
     expect(three.bottom - three.top).toBe(two.bottom - two.top);
-    expect(three.width).toBeGreaterThan(two.width);
+    for (const value of [7, 42, 100]) {
+      const { width, height } = drawn(icon(value));
+      expect(width).toBeGreaterThanOrEqual(height * 1.5);
+    }
   });
 
   it("centers every width of reading inside a square icon", () => {
