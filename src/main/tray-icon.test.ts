@@ -1,15 +1,9 @@
 import { describe, expect, it } from "vite-plus/test";
 import { batteryHealth } from "../shared/battery";
-import { percentIcon, TRAY_ICON_SIZE } from "./tray-icon";
+import { healthIcon, TRAY_ICON_SIZE } from "./tray-icon";
 
-const orange = [30, 83, 217, 255];
-// A mark with a translucent edge before its first opaque pixel, in BGRA like `nativeImage.toBitmap`.
-const mark = Buffer.from([0, 0, 0, 0, 30, 83, 217, 128, ...orange]);
 const icon = (value: number) =>
-  percentIcon(
-    batteryHealth({ ok: true, reading: { percent: 50, charging: false, health: value }, checkedAt: 0 })!,
-    mark,
-  );
+  healthIcon(batteryHealth({ ok: true, reading: { percent: 50, charging: false, health: value }, checkedAt: 0 })!);
 
 /** The lit pixels' bounding box, and the color of the first one. */
 function drawn(bitmap: Buffer) {
@@ -27,8 +21,20 @@ function drawn(bitmap: Buffer) {
 }
 
 describe("tray icon", () => {
-  it("draws the digits in the mark's opaque color", () => {
-    expect(drawn(icon(42)).color).toEqual(orange);
+  it("colors the health green from 80, amber from 60, and red below", () => {
+    const [green, amber, red] = [
+      [0x84, 0xdc, 0x3d, 255],
+      [0x3d, 0xb8, 0xf5, 255],
+      [0x5c, 0x5c, 0xff, 255],
+    ];
+    expect([100, 80, 79, 60, 59, 0].map((value) => drawn(icon(value)).color)).toEqual([
+      green,
+      green,
+      amber,
+      amber,
+      red,
+      red,
+    ]);
   });
 
   it("centers every width of reading inside the icon", () => {
@@ -40,7 +46,7 @@ describe("tray icon", () => {
     }
   });
 
-  it("keeps 100 close to the size of two digits", () => {
-    expect(drawn(icon(100)).height / drawn(icon(99)).height).toBeGreaterThan(0.75);
+  it("draws 100 as large as two digits", () => {
+    expect(drawn(icon(100)).height).toBe(drawn(icon(99)).height);
   });
 });

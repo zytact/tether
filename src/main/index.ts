@@ -28,7 +28,7 @@ import { alertNotification } from "./notification";
 import { launchedHidden, openAtLogin, setOpenAtLogin } from "./open-at-login";
 import { changeSettings, loadSettings } from "./settings";
 import { SoundPlayer } from "./sound";
-import { percentIcon, TRAY_ICON_SIZE } from "./tray-icon";
+import { healthIcon, TRAY_ICON_SIZE } from "./tray-icon";
 import { trayItems } from "./tray-menu";
 import type { TrayAction } from "./tray-menu";
 import { MANIFEST_URL, Updater } from "./update";
@@ -247,17 +247,14 @@ function trayImage() {
   return sized;
 }
 
-/** macOS writes the health beside its template mark; elsewhere the health replaces the mark, drawn in
- * the mark's color. Without a health reading the tray shows the plain mark. */
+/** macOS writes the health beside its template mark; elsewhere a heart and the health replace the mark,
+ * colored by how worn the battery is. Without a health reading the tray shows the plain mark. */
 function showHealth(tray: Tray, health: WholePercent | null) {
   if (process.platform === "darwin")
     tray.setTitle(health === null ? "" : `${health}%`, { fontType: "monospacedDigit" });
-  else tray.setImage(health === null ? trayImage() : healthImage(health));
-}
-
-function healthImage(health: WholePercent) {
-  const bitmap = percentIcon(health, trayImage().toBitmap());
-  return nativeImage.createFromBitmap(bitmap, { width: TRAY_ICON_SIZE, height: TRAY_ICON_SIZE });
+  else if (health === null) tray.setImage(trayImage());
+  else
+    tray.setImage(nativeImage.createFromBitmap(healthIcon(health), { width: TRAY_ICON_SIZE, height: TRAY_ICON_SIZE }));
 }
 
 function publish<E extends keyof Events>(event: E, payload: Events[E]) {
