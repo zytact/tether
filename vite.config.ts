@@ -1,8 +1,8 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig, lazyPlugins } from "vite-plus";
 
-/** Build output and the hand-laid-out agent skill docs. */
-const notOurs = ["dist/**", "dist-electron/**", "release/**", ".agents/**", ".claude/**"];
+/** Build output, the hand-laid-out agent skill docs, and the changelog release-please writes. */
+const notOurs = ["dist/**", "dist-electron/**", "release/**", ".agents/**", ".claude/**", "CHANGELOG.md"];
 
 /** The packaged window loads its page from disk, so the policy ships as a meta tag. The dev server
  * injects an inline script for fast refresh, so it only applies to builds. */
