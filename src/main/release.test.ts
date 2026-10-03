@@ -75,7 +75,7 @@ describe("release manifest", () => {
             draft: false,
             prerelease: false,
             published_at: "2026-01-01",
-            body: "* feat(ui): show progress by @a in https://x\n* fix: retry installs",
+            body: "* feat(ui): show progress by @a in https://x\n* fix: retry installs by @a in https://x",
           },
           { tag_name: "v2.9.0", draft: false, prerelease: false, body: "* feat: too old" },
         ],
@@ -91,6 +91,28 @@ describe("release manifest", () => {
           { kind: "fixed", scope: null, summary: "retry installs" },
         ],
       },
+    ]);
+  });
+
+  it("reads release-please notes as plain text grouped by section", () => {
+    const body = [
+      "## [3.4.0](https://x/compare/v3.3.0...v3.4.0) (2026-10-03)",
+      "### ⚠ BREAKING CHANGES",
+      "* **tray:** drop the old icon",
+      "### Features",
+      "* **tray:** drop the old icon ([#30](https://x/30)) ([abc1234](https://x/abc1234))",
+      "* color the tray by wear ([#27](https://x/27)) ([820785c](https://x/820785c))  ",
+      "### Bug Fixes",
+      "* keep `vp check` and [docs](https://x/docs) readable ([def5678](https://x/def5678))",
+      "* show the ([setup guide](https://x/setup)) ([#31](https://x/31)) ([0a1b2c3](https://x/0a1b2c3)), closes [#26](https://x/26)",
+    ].join("\n");
+    expect(
+      parseReleases([{ tag_name: "v3.4.0", draft: false, prerelease: false, body }], "3.3.0", "3.4.0")[0].changes,
+    ).toEqual([
+      { kind: "new", scope: "tray", summary: "drop the old icon" },
+      { kind: "new", scope: null, summary: "color the tray by wear" },
+      { kind: "fixed", scope: null, summary: "keep vp check and docs readable" },
+      { kind: "fixed", scope: null, summary: "show the (setup guide)" },
     ]);
   });
 

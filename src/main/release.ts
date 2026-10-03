@@ -101,25 +101,45 @@ function releaseNotes(release: PublishedRelease, version: string): ReleaseNotes 
   };
 }
 
+const sectionKinds: Partial<Record<string, ReleaseChange["kind"]>> = { Features: "new", "Bug Fixes": "fixed" };
+const typeKinds: Partial<Record<string, ReleaseChange["kind"]>> = { feat: "new", fix: "fixed" };
+
+/** Reads the changes from a release body. release-please groups them under headings and links each
+ * to its pull request and commit, while older releases list GitHub's generated PR titles. */
 function parseChanges(body: string): ReleaseChange[] {
-  let credits = false;
+  let section = "";
   return body.split(/\r?\n/).flatMap((line): ReleaseChange[] => {
     const heading = /^#+\s+(.*)$/.exec(line);
-    if (heading) credits = heading[1].trim() === "New Contributors";
+    if (heading) section = heading[1].trim();
     const bullet = /^\s*[-*]\s+(.+)$/.exec(line);
-    if (credits || !bullet) return [];
-    const summary = bullet[1].replace(/ by @\S+ in \S+$/, "").trim();
-    const title = /^(\w+)(?:\(([^)]*)\))?!?:\s*(.+)$/.exec(summary);
-    if (!title) return [{ kind: "changed", scope: null, summary }];
-    return [
-      {
-        kind: title[1] === "feat" ? "new" : title[1] === "fix" ? "fixed" : "changed",
-        scope: title[2] || null,
-        summary: title[3],
-      },
-    ];
+    if (!bullet || section === "New Contributors" || section.includes("BREAKING CHANGES")) return [];
+    const generated = / by @\S+ in \S+$/.exec(bullet[1]);
+    return [generated ? generatedChange(bullet[1].slice(0, generated.index)) : releasePleaseChange(bullet[1], section)];
   });
 }
+
+function generatedChange(title: string): ReleaseChange {
+  const commit = /^(\w+)(?:\(([^)]*)\))?!?:\s*(.+)$/.exec(title.trim());
+  if (!commit) return { kind: "changed", scope: null, summary: title.trim() };
+  return { kind: typeKinds[commit[1]] ?? "changed", scope: commit[2] || null, summary: commit[3] };
+}
+
+function releasePleaseChange(line: string, section: string): ReleaseChange {
+  const text = line.replace(/,\s+closes\s+\[.*$/i, "").replace(/\s*\(\[(?:#\d+|[0-9a-f]{7,40})\]\([^)]*\)\)/g, "");
+  const scoped = /^\*\*([^*]+):\*\*\s*(.+)$/.exec(text);
+  return {
+    kind: sectionKinds[section] ?? "changed",
+    scope: scoped ? scoped[1] : null,
+    summary: plainText(scoped ? scoped[2] : text),
+  };
+}
+
+/** Drops the inline Markdown a release-please summary can carry, keeping the text of links and code. */
+const plainText = (markdown: string) =>
+  markdown
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\*\*|`/g, "")
+    .trim();
 
 /** Whether `signature`, base64, is the release key's Ed25519 signature of `data`. */
 export function verifySignature(data: Buffer, signature: string, publicKey = PUBLIC_KEY): boolean {
