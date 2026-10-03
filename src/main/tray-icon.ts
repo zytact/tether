@@ -28,8 +28,8 @@ const WORN = Buffer.from([0x3d, 0xb8, 0xf5, 255]);
 const FAILING = Buffer.from([0x5c, 0x5c, 0xff, 255]);
 
 /** Draws a heart and `health` as digits, green from 80, amber from 60, and red below, as a BGRA bitmap
- * the way `nativeImage` reads it. A wide icon is as wide as the digits and `TRAY_ICON_SIZE` tall, or shorter
- * when that would make it too narrow to stay wide; a square one centers them. */
+ * the way `nativeImage` reads it. Both shapes center the digits. A wide icon is `TRAY_ICON_SIZE` tall and
+ * as wide as the digits, padded when they are too narrow to stay wide. */
 export function healthIcon(health: WholePercent, shape: "wide" | "square") {
   const glyphs = [
     heart,
@@ -38,8 +38,8 @@ export function healthIcon(health: WholePercent, shape: "wide" | "square") {
       .map((digit) => digitGlyphs[digit]),
   ];
   const drawnWidth = glyphs.reduce((sum, glyph) => sum + glyph[0].length, glyphs.length - 1) * SCALE;
-  const width = shape === "wide" ? drawnWidth : Math.max(drawnWidth, TRAY_ICON_SIZE);
-  const height = shape === "wide" ? Math.min(TRAY_ICON_SIZE, Math.floor(width / WIDE_RATIO)) : width;
+  const width = Math.max(drawnWidth, shape === "wide" ? Math.ceil(TRAY_ICON_SIZE * WIDE_RATIO) : TRAY_ICON_SIZE);
+  const height = shape === "wide" ? TRAY_ICON_SIZE : width;
   const top = Math.floor((height - GLYPH_HEIGHT * SCALE) / 2);
   let left = Math.floor((width - drawnWidth) / 2);
 

@@ -42,22 +42,26 @@ describe("tray icon", () => {
     ]);
   });
 
-  it("keeps a wide icon one height, as wide as its digits, and wide enough for GNOME", () => {
-    const [two, three] = [drawn(icon(99)), drawn(icon(100))];
-    for (const drawing of [two, three]) {
-      expect(drawing.height).toBe(TRAY_ICON_SIZE);
-      expect([drawing.left, drawing.right]).toEqual([0, drawing.width - 1]);
-      expect(centered(drawing.top, drawing.bottom, drawing.height)).toBe(true);
-    }
-    expect(three.bottom - three.top).toBe(two.bottom - two.top);
-    for (const value of [7, 42, 100]) {
+  it("keeps every wide icon one height and wide enough for GNOME", () => {
+    for (let value = 0; value <= 100; value++) {
       const { width, height } = drawn(icon(value));
+      expect(height).toBe(TRAY_ICON_SIZE);
       expect(width).toBeGreaterThanOrEqual(height * 1.5);
     }
   });
 
+  it("centers a wide icon's digits and draws them one size", () => {
+    const sizes = [1, 42, 100].map((value) => {
+      const wide = drawn(icon(value));
+      expect(centered(wide.left, wide.right, wide.width)).toBe(true);
+      expect(centered(wide.top, wide.bottom, wide.height)).toBe(true);
+      return wide.bottom - wide.top;
+    });
+    expect(new Set(sizes).size).toBe(1);
+  });
+
   it("centers every width of reading inside a square icon", () => {
-    for (const value of [7, 42, 100]) {
+    for (const value of [1, 42, 100]) {
       const square = drawn(icon(value, "square"));
       expect(square.width).toBe(square.height);
       expect(centered(square.left, square.right, square.width)).toBe(true);
