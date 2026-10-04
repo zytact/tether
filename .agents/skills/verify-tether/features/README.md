@@ -9,6 +9,6 @@ One file per user-facing feature of the preview app.
 - [settings-window](settings-window.md) - validation, persistence across restarts, and open at login
 - [tray-and-window](tray-and-window.md) - tray menu, closing to the tray, reopening, and quitting
 - [health-history](health-history.md) - the daily health record and its graph
-- [updates](updates.md) - finding, offering, and refusing to install releases
+- [updates](updates.md) - release offers, notes, notices, progress, fresh-install requirements, and signature rejection
 
 Every proof runs on the built Tether Preview through the helpers in `scripts/`, with the fake battery unless the file says otherwise.

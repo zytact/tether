@@ -8,7 +8,7 @@ The main process keeps the last health of each local day in `health-history.json
 - The live update of today's point after a check.
 - The hover and keyboard tooltip.
 - Malformed saved samples are skipped on load.
-- The hidden section on a battery without health.
+- The hidden section when no health history exists, and retained history when current health is unavailable.
 
 ## How to get to it (user POV)
 
@@ -25,7 +25,7 @@ node $S/drive.ts press img "Battery health" ArrowLeft && node $S/drive.ts screen
 $S/collect.sh "$EVIDENCE"
 ```
 
-Proof: the chart ends at today's health and moves when the battery's health does; `health-history.json` holds one sample for today and no `bad` day; the tooltip names the hovered or selected day. Launch without `--history` to see the one-day state, and with `--health none` to see the section hidden.
+Proof: the chart ends at today's health and moves when the battery's health does; `health-history.json` holds one sample for today and no `bad` day; the tooltip names the hovered or selected day. Launch without `--history` to see the one-day state, and with `--health none` and no seeded history to see the section hidden. Set the running battery to `none` after recording health to confirm the graph stays visible.
 
 ## Gotchas
 

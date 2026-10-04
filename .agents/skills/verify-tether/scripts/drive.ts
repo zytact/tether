@@ -27,6 +27,10 @@ try {
     case "snapshot":
       console.log(await page.locator("body").ariaSnapshot());
       break;
+    case "wait-hidden":
+      await page.getByText(args[0], { exact: true }).waitFor({ state: "hidden", timeout: 35000 });
+      console.log(`HIDDEN "${args[0]}"`);
+      break;
     case "click":
       await page.getByRole(args[0], { name: args[1], exact: true }).click();
       console.log(`CLICKED ${args[0]} "${args[1]}"`);
@@ -52,7 +56,7 @@ try {
       break;
     case "screenshot": {
       const path = join(args[0], `${args[1] ?? "screenshot"}.png`);
-      await page.screenshot({ path });
+      await page.screenshot({ path, fullPage: true });
       console.log(`SCREENSHOT: ${path}`);
       break;
     }
@@ -61,7 +65,7 @@ try {
       console.log("CLOSED the window");
       break;
     default:
-      throw new Error("usage: drive.ts <snapshot | click ROLE NAME | hover ROLE NAME | press ROLE NAME KEY | fill LABEL VALUE | select LABEL OPTION | screenshot DIR [NAME] | close>");
+      throw new Error("usage: drive.ts <snapshot | wait-hidden TEXT | click ROLE NAME | hover ROLE NAME | press ROLE NAME KEY | fill LABEL VALUE | select LABEL OPTION | screenshot DIR [NAME] | close>");
   }
 } finally {
   // Disconnects without closing the preview.
