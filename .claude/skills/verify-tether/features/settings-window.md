@@ -1,8 +1,8 @@
 # Settings window
 
-Every field saves on commit: numbers on Enter or when focus leaves, switches and urgency on change. The main process validates the whole change, writes `settings.json`, then applies it. An out-of-range number shows `Enter a whole number from <min> to <max>.` and puts the saved value back. On launch, a saved field that is missing or invalid falls back to its default on its own.
+Alert settings save on commit: numbers on Enter or when focus leaves, switches and urgency on change. The main process validates the whole change, writes `settings.json`, then applies it. An out-of-range number shows `Enter a whole number from <min> to <max>.` and puts the saved value back. On launch, a saved field that is missing or invalid falls back to its default on its own.
 
-Open at login writes an XDG autostart entry on Linux that launches with `--hidden`, and a login item on macOS and Windows. The switch reads the operating system each time the window opens.
+Open at login writes an XDG autostart entry on Linux that launches with `--hidden`, and a login item on macOS and Windows. The switch reads the operating system when a new window is created.
 
 ## Sub-features
 

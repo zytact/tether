@@ -1,6 +1,6 @@
 # High battery alerts
 
-While the battery is charging and sits at or above the high level, each check sends a notification titled `Battery Status: Charging` with the body `Charge: <rounded percent>%`. The level is inclusive.
+While the battery is charging and sits at or above the high level, each check sends a notification titled `Battery Status: Charging` with the body `Charge: <rounded percent>%`. The level is inclusive. Notifications stop at the [session limit](alert-sessions.md).
 
 ## Sub-features
 
@@ -19,11 +19,12 @@ $S/battery.sh Charging 84 && sleep 5 && $S/collect.sh "$EVIDENCE"
 $S/battery.sh Charging 85 && sleep 5 && $S/collect.sh "$EVIDENCE"
 node $S/drive.ts click switch "High battery alerts" && $S/collect.sh "$EVIDENCE"
 sleep 6 && $S/collect.sh "$EVIDENCE"
+node $S/drive.ts snapshot
 ```
 
 Proof: no `Charging` notification at 84, alerts at 85, and the count stays the same across the six seconds after the switch turns off. The snapshot shows the switch `Off`.
 
 ## Gotchas
 
-- `Full 100` does not alert, since a full battery is not charging. That matches the Rust CLI.
+- `Full 100` does not alert, since a full battery is not charging.
 - Discharging at 95 never alerts high.

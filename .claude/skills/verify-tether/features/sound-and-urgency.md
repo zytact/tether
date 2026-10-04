@@ -23,6 +23,7 @@ $S/launch.sh --settings "{\"intervalSeconds\":2,\"notifyAttempts\":2,\"soundPath
 node $S/drive.ts select Urgency Critical
 $S/battery.sh Discharging 10 && sleep 6 && $S/collect.sh "$EVIDENCE"
 node $S/drive.ts click button Clear && node $S/drive.ts snapshot | grep -A1 'heading "Sound"'
+$S/collect.sh "$EVIDENCE/cleared"
 ```
 
 Proof: `notifications.txt` shows `urgency=2`, `audio-streams.txt` lists a `tether-preview` stream inside the alert window, and `preview.log` has no `Failed to play`. After `Clear`, the row reads `The system notification sound.` and `settings.json` holds `"soundPath": null`.

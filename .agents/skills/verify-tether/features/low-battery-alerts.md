@@ -1,6 +1,6 @@
 # Low battery alerts
 
-While the battery is not charging and sits at or below the low level, each check sends a notification titled `Battery Status: Discharging` with the body `Charge: <rounded percent>%`. The level is inclusive. Any status other than `Charging`, including `Full` and `Not charging`, counts as not charging.
+While the battery is not charging and sits at or below the low level, each check sends a notification titled `Battery Status: Discharging` with the body `Charge: <rounded percent>%`. The level is inclusive. Notifications stop at the [session limit](alert-sessions.md). On Linux, any status other than `Charging`, including `Full` and `Not charging`, counts as not charging.
 
 ## Sub-features
 
@@ -26,5 +26,5 @@ Proof: `notifications.txt` gains `summary=Battery Status: Discharging | body=Cha
 
 ## Gotchas
 
-- `Charging 10` never alerts low, and `Full 10` does, since only `Charging` counts as charging.
+- `Charging 10` never alerts low, and `Full 10` does, since only `Charging` counts as charging on Linux.
 - The switch off must stop alerts at once. Use a large `notifyAttempts` so the limit does not stop them first.

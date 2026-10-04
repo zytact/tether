@@ -5,7 +5,7 @@ description: Build and drive the isolated Tether Preview Electron tray app again
 
 # Verify Tether
 
-Tether is an Electron tray app. The main process reads the battery on an interval, decides alerts in `src/main/alerts.ts`, sends notifications, and plays the chosen sound in a hidden window. The window is a settings page. Every change there saves to `settings.json` and applies to the running monitor at once. There is no CLI.
+Tether is an Electron tray app. The main process reads the battery on an interval, decides alerts in `src/main/alerts.ts`, sends notifications, and plays the chosen sound in a hidden window. The window is a settings page. Alert settings save to `settings.json` and apply to the running monitor at once. Open at login changes the operating system registration. There is no CLI.
 
 Verification uses the built preview app on Linux. Drive its real window over the Chrome DevTools Protocol, its tray menu over D-Bus, and its battery through a fake sysfs tree. Do not load `dist/index.html` or the dev server in a browser, and do not stub `window.tether`: a plain tab has no preload bridge and no monitor.
 
@@ -41,7 +41,7 @@ Ready means `launch.sh` prints `Ready: Tether Preview` and `doctor.sh` ends with
 
 - `--settings JSON` seeds `settings.json` before the first launch. Use it for a short interval and a sound path, since the file chooser is a native dialog the harness cannot drive. Fields left out take their defaults.
 - `--health N | none` sets the fake battery's starting health instead of 87%.
-- `--history JSON` seeds `health-history.json`, an array of `{"day":"YYYY-MM-DD","health":N}` samples, since the app records at most one a day.
+- `--history JSON` seeds `health-history.json`, an array of `{"day":"YYYY-MM-DD","health":N}` samples, since the app keeps the latest reading for each local day.
 - `--real-battery` skips the fake tree and reads the machine's battery. Use it once to confirm the fake tree is not lying.
 - `--restart` quits and relaunches only the preview, keeping the display, recorders, battery, and saved settings. That is how a proof shows a setting survives a restart.
 
@@ -113,7 +113,7 @@ Run it after each step worth proving; it reflects everything since launch. It wr
 | `settings.json` | what the app saved |
 | `health-history.json` | the daily health samples the app saved |
 
-Add screenshots with `drive.ts screenshot` after each materially different window state, and a short `notes.md` naming what was covered and what could not be.
+Add full-page screenshots with `drive.ts screenshot` after each materially different window state, including rows below the window, and a short `notes.md` naming what was covered and what could not be.
 
 Proof standards:
 
@@ -140,9 +140,10 @@ All scripts live in `scripts/` and are executable:
 - `launch.sh [--real-battery] [--health N | none] [--settings JSON] [--history JSON] | --restart` starts the preview with its display, recorders, and fake battery.
 - `doctor.sh` checks the instance without changing it.
 - `battery.sh <status> <percent> [health | none]` rewrites the fake battery.
-- `drive.ts <snapshot | click ROLE NAME | hover ROLE NAME | press ROLE NAME KEY | fill LABEL VALUE | select LABEL OPTION | screenshot DIR [NAME] | close>` drives the window. Run it with `node`.
+- `drive.ts <snapshot | wait-hidden TEXT | click ROLE NAME | hover ROLE NAME | press ROLE NAME KEY | fill LABEL VALUE | select LABEL OPTION | screenshot DIR [NAME] | close>` drives the window. `wait-hidden` waits up to 35 seconds for exact text to disappear. Run it with `node`.
 - `tray.sh <layout | click LABEL | icon DIR [NAME]>` reads or clicks the tray menu, or saves the tray icon and prints its tooltip.
 - `collect.sh <dir>` copies and parses the recordings.
+- `update-server.py <dir>` serves a local update manifest and a slow, unsigned download. [updates](features/updates.md) owns its setup and teardown.
 - `cleanup.sh` stops what the harness started and keeps evidence.
 
 `common.sh` holds the shared paths and is sourced by the others.

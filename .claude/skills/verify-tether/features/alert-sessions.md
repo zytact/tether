@@ -22,7 +22,7 @@ Both fields sit below the level rows in the window. The effects show up as the a
 
 ```sh
 $S/launch.sh --settings '{"intervalSeconds":3,"notifyAttempts":2}'
-$S/battery.sh Discharging 12 && sleep 8 && $S/collect.sh "$EVIDENCE"     # 2, then quiet
+$S/battery.sh Discharging 12 && sleep 10 && $S/collect.sh "$EVIDENCE"     # 2, then quiet
 node $S/drive.ts fill "Low battery level" 15 && sleep 1 && $S/collect.sh "$EVIDENCE"   # 3 at once
 $S/battery.sh Discharging 50 && sleep 4 && $S/battery.sh Discharging 12 && sleep 4 && $S/collect.sh "$EVIDENCE"
 ```
