@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import { batteryHealth } from "../shared/battery";
-import { healthIcon, TRAY_ICON_SIZE } from "./tray-icon";
+import { healthIcon, shapes } from "./tray-icon";
 
 const icon = (value: number, shape: "wide" | "square" = "wide") =>
   healthIcon(
@@ -45,7 +45,7 @@ describe("tray icon", () => {
   it("keeps every wide icon one height and wide enough for GNOME", () => {
     for (let value = 0; value <= 100; value++) {
       const { width, height } = drawn(icon(value));
-      expect(height).toBe(TRAY_ICON_SIZE);
+      expect(height).toBe(shapes.wide.size);
       expect(width).toBeGreaterThanOrEqual(height * 1.5);
     }
   });
