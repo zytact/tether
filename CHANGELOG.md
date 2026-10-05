@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.3.1](https://github.com/zytact/tether/compare/v3.3.0...v3.3.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **ci:** stop formatting the release-please changelog ([#31](https://github.com/zytact/tether/issues/31)) ([afdea1e](https://github.com/zytact/tether/commit/afdea1eab532c24ee9baaeb5151c031165e7eff1))
+* **tray:** draw the linux health icon at panel height so it takes no extra width ([#33](https://github.com/zytact/tether/issues/33)) ([c35cd4e](https://github.com/zytact/tether/commit/c35cd4e373cc1d79dff9baf5cb8734d5db979c4d))
+* **updater:** read release-please notes in what's new ([#29](https://github.com/zytact/tether/issues/29)) ([b7b3fa5](https://github.com/zytact/tether/commit/b7b3fa53bd66fdba2ea1c637bfb57c6182c93c0c))
+
 ## [3.3.0](https://github.com/zytact/tether/compare/v3.2.0...v3.3.0) (2026-10-03)
 
 
